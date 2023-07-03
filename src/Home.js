@@ -1,42 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firebase } from '../config';
 import { FlashList } from '@shopify/flash-list';
+import { Entypo } from '@expo/vector-icons';
 
 const Home = () => {
   const navigation = useNavigation();
   const [notes, setNotes] = useState([]);
 
   useEffect(() => {
-    firebase
-      .firestore()
-      .collection('notes')
-      .onSnapshot((querySnapshot) => {
-        const newNotes = [];
-        querySnapshot.forEach((doc) => {
-          const { note, title } = doc.data();
-          newNotes.push({ note, title, id: doc.id });
-        });
-        setNotes(newNotes);
+    const unsubscribe = firebase.firestore().collection('notes').onSnapshot((querySnapshot) => {
+      const newNotes = [];
+      querySnapshot.forEach((doc) => {
+        const { note, title } = doc.data();
+        newNotes.push({ note, title, id: doc.id });
       });
+      setNotes(newNotes);
+    });
+
+    return () => unsubscribe(); // Clean up the snapshot listener when component unmounts
   }, []);
 
   return (
     <View style={styles.container}>
-      {/* <Text>Home</Text> */}
       <FlashList
         data={notes}
         numColumns={1}
         estimatedItemSize={100}
         renderItem={({ item }) => (
           <View style={styles.notesView}>
-            <Text style={styles.noteTitle}>{item.title}</Text>
-            <Text style={styles.noteDescription}>{item.note}</Text>
+            <Pressable onPress={() => navigation.navigate('Detail', { item })}>
+              <Text style={styles.noteTitle}>{item.title}</Text>
+              <Text style={styles.noteDescription}>{item.note}</Text>
+            </Pressable>
           </View>
         )}
       />
-      <Button title="Add Notes" onPress={() => navigation.navigate("NoteAdd")} />
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('NoteAdd')}>
+        <Entypo name="plus" size={45} color="white" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -46,7 +49,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#73fbd3',
+    backgroundColor: '#daefda',
   },
   notesView: {
     flex: 1,
@@ -68,5 +71,14 @@ const styles = StyleSheet.create({
   noteDescription: {
     marginTop: 5,
     fontSize: 15,
+  },
+  button: {
+    position: 'absolute',
+    bottom: 60,
+    right: 20, // Adjusted the position of the button
+    backgroundColor: '#4a8fe7',
+    borderRadius: 50,
+    padding: 10,
+    elevation: 7,
   },
 });

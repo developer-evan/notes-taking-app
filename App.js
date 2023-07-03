@@ -7,6 +7,7 @@ import NoteAdd from './src/NoteAdd';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Header from './src/Header';
+import Detail from './src/Detail';
 
 const Stack = createStackNavigator();
 
@@ -27,7 +28,7 @@ export default function App() {
           component={Home}
           name="Home"
           options={{
-            headerTitle: () => <Header name="Add Notes"/>,
+            headerTitle: () => <Header name="Notes"/>,
             headerStyle:{
               backgroundColor: '#4a8fe7',
               height:60,
@@ -39,6 +40,17 @@ export default function App() {
           name="NoteAdd"
           options={{
             headerTitle: () => <Header name="Add Notes"/>,
+            headerStyle:{
+              backgroundColor: '#4a8fe7',
+              height:60,
+            }}
+          }
+          />
+           <Stack.Screen
+          component={Detail}
+          name="Detail"
+          options={{
+            headerTitle: () => <Header name="Edit Notes"/>,
             headerStyle:{
               backgroundColor: '#4a8fe7',
               height:60,
